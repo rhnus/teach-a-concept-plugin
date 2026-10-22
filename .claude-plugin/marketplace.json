@@ -9,7 +9,7 @@
       "name": "teach-a-concept",
       "source": "./plugins/teach-a-concept",
       "description": "Turn a design, proposal, piece of code or work process into a short, visual, presentable teaching pack, kept in a concept library in the repo with an onboarding order and an out-of-date check.",
-      "version": "1.0.0"
+      "version": "1.0.1"
     }
   ]
 }

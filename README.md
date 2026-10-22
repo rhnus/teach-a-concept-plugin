@@ -89,6 +89,7 @@ python .concepts/tool/scripts/concepts.py list          # every pack and its sta
 python .concepts/tool/scripts/concepts.py check         # packs whose sources changed
 python .concepts/tool/scripts/concepts.py check --mark  # ...and flag them needs-review
 python .concepts/tool/scripts/concepts.py install-hook  # warn (never block) on commits that touch a pack's sources
+python .concepts/tool/scripts/concepts.py publish-copy <slug>  # the pack without its <html>/<head> wrapper, for hosts that add one
 ```
 
 `check` exits 0 either way, so it's safe in CI as an informational step. `--help` lists every command.

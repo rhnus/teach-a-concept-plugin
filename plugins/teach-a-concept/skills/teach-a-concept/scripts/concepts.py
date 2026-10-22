@@ -15,6 +15,7 @@ generated from the meta files, so never hand-edit it.
   remove    <slug> [--committed]
   link      <path> [line] [end]    web URL for a source file (Azure DevOps, GitHub, GitLab, Bitbucket)
   theme     <default|nus|path.css> re-theme every pack and the index
+  publish-copy <slug> [--out f]     write the pack without its <html>/<head>/<body> wrapper, for hosts that add their own
   install-hook                     non-blocking git pre-commit warning
   index | list | sync-tool
 
@@ -31,9 +32,10 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import urllib.parse
 
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 TOOL_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 TEMPLATE = os.path.join(TOOL_DIR, "assets", "pack-template.html")
 THEMES = os.path.join(TOOL_DIR, "assets", "themes")
@@ -43,6 +45,10 @@ SLUG = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 THEME_BLOCK = re.compile(r"/\* theme:start \*/.*?/\* theme:end \*/", re.S)
 STATUS_BLOCK = re.compile(r"<!-- concept-status -->.*?<!-- /concept-status -->", re.S)
 READ_BLOCK = re.compile(r"<!-- read-time -->.*?<!-- /read-time -->", re.S)
+SOURCES_BLOCK = re.compile(r"<!-- sources -->.*?<!-- /sources -->", re.S)
+WRAPPER = re.compile(r"<!doctype html>\s*|</?html\b[^>]*>\s*|</?head>\s*|</?body>\s*|<meta charset=[^>]*>\s*|"
+                     r"<meta name=\"viewport\"[^>]*>\s*", re.I)
+SOURCES_SHOWN = 3
 PLACEHOLDER = re.compile(r"\[\[[^\]]+\]\]")
 HOOK_MARK = "concept-library pre-commit"
 DEFAULTS = {"version": 1, "library": "docs/concepts", "brand": "Concept library", "theme": "default",
@@ -127,7 +133,7 @@ def load(slug):
 
 def save(meta):
     write(meta_path(meta["slug"]), json.dumps(meta, indent=2, ensure_ascii=False) + "\n")
-    stamp_status(meta)
+    stamp_page(meta)
 
 
 def packs():
@@ -236,14 +242,25 @@ def fill(text, values):
     return text
 
 
+def sources_html(meta):
+    """The header's "Built from" line; a long list folds behind a count so the header stays short."""
+    e = html.escape
+    items = [f'<a href="{e(link_or_relative(s, meta["slug"]))}">{e(s)}</a>' for s in meta["sources"]]
+    items += [e(r) for r in meta["references"]]
+    if not items:
+        return "Built from notes supplied by the owner"
+    if len(items) <= SOURCES_SHOWN:
+        return "Built from " + ", ".join(items)
+    return (f'Built from <details><summary>{len(items)} sources</summary>'
+            f'<span class="source-list">{", ".join(items)}</span></details>')
+
+
 def render_pack(meta):
     e = html.escape
-    sources = ", ".join(f'<a href="{e(link_or_relative(s, meta["slug"]))}">{e(s)}</a>' for s in meta["sources"])
-    refs = ", ".join(e(r) for r in meta["references"])
     page = fill(read(TEMPLATE), {
         "title": e(meta["title"]), "summary": e(meta["summary"]), "type_label": e(TYPES[meta["type"]]),
         "audience": e(meta["audience"]), "minutes": str(meta["meeting_minutes"]), "owner": e(meta["owner"]),
-        "sources": ", ".join(x for x in (sources, refs) if x) or "notes supplied by the owner",
+        "sources": sources_html(meta),
         "date": meta["created"], "brand": e(CONFIG["brand"]), "theme_key": e(CONFIG["theme_key"]),
         "pack_path": e(f"{CONFIG['library']}/{meta['slug']}/index.html"),
     })
@@ -258,15 +275,18 @@ def status_line(meta):
     return f"Current, checked against the code on {meta['checked_date']}."
 
 
-def stamp_status(meta):
+def stamp_page(meta):
+    """Rewrite the generated blocks in the pack (status banner, source list) from meta.json."""
     page = page_path(meta["slug"])
     if not os.path.isfile(page):
         return
     banner = (f'<!-- concept-status --><p class="concept-status concept-status--{meta["status"]}">'
               f'{status_line(meta)}</p><!-- /concept-status -->')
+    sources = f"<!-- sources -->{sources_html(meta)}<!-- /sources -->"
     text = read(page)
-    if STATUS_BLOCK.search(text):
-        write(page, STATUS_BLOCK.sub(lambda _: banner, text))
+    updated = SOURCES_BLOCK.sub(lambda _: sources, STATUS_BLOCK.sub(lambda _: banner, text))
+    if updated != text:
+        write(page, updated)
 
 
 def reading_minutes(text):
@@ -612,6 +632,13 @@ def cmd_link(a):
     print(url)
 
 
+def cmd_publish_copy(a):
+    load(a.slug)
+    out = a.out or os.path.join(tempfile.gettempdir(), "teach-a-concept", f"{a.slug}.html")
+    write(out, WRAPPER.sub("", read(page_path(a.slug))))
+    print(out)
+
+
 def cmd_theme(a):
     theme_css(a.name)
     CONFIG["theme"] = a.name
@@ -694,6 +721,9 @@ def main(argv=None):
     lk.add_argument("line", nargs="?", type=int)
     lk.add_argument("end", nargs="?", type=int)
     sub.add_parser("theme").add_argument("name")
+    pc = sub.add_parser("publish-copy")
+    pc.add_argument("slug")
+    pc.add_argument("--out", help="where to write it (default: a temp folder; the path is printed)")
     sub.add_parser("install-hook")
     sub.add_parser("index")
     sub.add_parser("list")
@@ -709,7 +739,7 @@ def main(argv=None):
             return
         sync_tool()
         {"new": cmd_new, "verify": cmd_verify, "set": cmd_set, "supersede": cmd_supersede, "remove": cmd_remove,
-         "check": cmd_check, "link": cmd_link, "theme": cmd_theme, "list": cmd_list,
+         "check": cmd_check, "link": cmd_link, "theme": cmd_theme, "publish-copy": cmd_publish_copy, "list": cmd_list,
          "install-hook": lambda _: install_hook(), "index": lambda _: (write_index(), print("index rebuilt"))
          }[a.cmd](a)
     except ToolError as err:

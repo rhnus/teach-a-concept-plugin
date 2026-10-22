@@ -44,6 +44,11 @@ h1, h2, h3 { text-wrap: balance; }
 .facts { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 2px 0 0; padding: 0; list-style: none; font-size: 14px; color: var(--on-blue-muted); }
 .facts b { color: var(--on-blue); font-weight: 600; }
 .facts a { color: var(--on-blue); }
+.facts li.sources:has(details[open]) { flex-basis: 100%; }
+.facts details { display: inline; }
+.facts summary { display: inline; cursor: pointer; color: var(--on-blue); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+.facts summary::-webkit-details-marker { display: none; }
+.facts details[open] .source-list { display: block; margin-top: 4px; }
 
 .concept-status { font-size: 14px; font-weight: 600; padding: 8px 14px; border-radius: 8px; margin: 20px 0 0; }
 .concept-status--current { color: var(--done); background: var(--done-bg); }
@@ -135,7 +140,7 @@ body.presenting .counter { display: block; position: fixed; right: 18px; bottom:
       <li><b>{{minutes}}</b>-minute meeting</li>
       <li><!-- read-time --><b>?</b> min read<!-- /read-time --></li>
       <li>Owner <b>{{owner}}</b></li>
-      <li>Built from {{sources}}</li>
+      <li class="sources"><!-- sources -->{{sources}}<!-- /sources --></li>
       <li>{{date}}</li>
     </ul>
   </div>
@@ -219,6 +224,9 @@ body.presenting .counter { display: block; position: fixed; right: 18px; bottom:
   });
   label();
 
+  // Key events can target the document itself (no .closest), e.g. when nothing has focus.
+  function within(target, selector) { return !!(target && target.closest && target.closest(selector)); }
+
   const slides = Array.from(document.querySelectorAll('section.slide'));
   const counter = document.getElementById('counter');
   const titleSlide = document.getElementById('title-slide');
@@ -237,7 +245,7 @@ body.presenting .counter { display: block; position: fixed; right: 18px; bottom:
   }
   document.getElementById('present').addEventListener('click', start);
   document.addEventListener('keydown', e => {
-    if (e.target.closest('input, textarea, select, [contenteditable]')) return;
+    if (within(e.target, 'input, textarea, select, [contenteditable]')) return;
     const presenting = document.body.classList.contains('presenting');
     if (!presenting) { if (e.key === 'p' || e.key === 'P') start(); return; }
     if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); show(index + 1); }
@@ -247,7 +255,7 @@ body.presenting .counter { display: block; position: fixed; right: 18px; bottom:
     else if (e.key === 'Escape') stop();
   });
   document.addEventListener('click', e => {
-    if (!document.body.classList.contains('presenting') || e.target.closest('a, button, pre')) return;
+    if (!document.body.classList.contains('presenting') || within(e.target, 'a, button, pre, summary')) return;
     show(index + (e.clientX < window.innerWidth / 3 ? -1 : 1));
   });
 })();

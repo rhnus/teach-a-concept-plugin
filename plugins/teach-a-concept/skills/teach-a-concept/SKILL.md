@@ -173,6 +173,7 @@ run.
 | `supersede <old> <new>` | A newer pack replaces an older one. The old one stays, so the reasoning behind past decisions can still be found. |
 | `remove <slug> [--committed]` | A pack made by mistake. Refuses if another pack is superseded by it, and refuses an already-committed pack unless `--committed` is passed. Prints the pack's shared link, which it does not delete. |
 | `theme <name or file.css>` | Re-themes every pack and the index. |
+| `publish-copy <slug> [--out <file>]` | Writes the pack without its `<!doctype>`, `<html>`, `<head>` and `<body>` wrapper and prints the path, for hosts that add their own (the `Artifact` tool does). The library file stays the master; never hand-strip a copy. |
 | `install-hook` | A git pre-commit hook that warns, never blocks, when a commit touches a pack's sources. Each teammate runs it once; git doesn't share hooks. |
 | `index` / `list` | Rebuild the index / list every pack with its status. |
 
@@ -214,7 +215,10 @@ presented straight from the page with no separate deck:
   rather than letting it scroll. A good slide is one heading, one diagram or a few short paragraphs, and
   nothing a presenter would skip.
 - Leave the marked blocks alone: `/* theme:start */…/* theme:end */`, `<!-- concept-status -->…`,
-  `<!-- read-time -->…`. The script rewrites them.
+  `<!-- read-time -->…`, `<!-- sources -->…`. The script rewrites them; change sources with `set`, and the
+  header's "Built from" line follows (more than three fold behind a count).
+- Pack-specific styles (diagram classes, a step list, a table) go in a second `<style>` block or just before
+  the template's `</style>`, built from the theme tokens.
 - Keep it **one self-contained file**: inline CSS, inline SVG, no external images or scripts (the only
   external request is the Google Fonts stylesheet, which falls back to system fonts offline).
 - If the `artifact-design` and `artifact-diagramming` skills are available, load them before writing: they
@@ -233,13 +237,15 @@ library page and keep the same six sections; the library page stays the master.
 ## The whole flow
 
 **New pack:** set up the library if needed → steps 1–5 → `new` → fill the page → `verify` → if the
-`Artifact` tool is available, publish the page with it (`file_path` = the pack's `index.html`; it starts
-private) and `set <slug> artifact_url=<url>` → if it belongs in the new-joiner path, `set <slug> start_here=<n>`.
+`Artifact` tool is available, run `publish-copy <slug>` and publish the file it prints (it starts private;
+republish that same path for later updates) and `set <slug> artifact_url=<url>` → if it belongs in the
+new-joiner path, `set <slug> start_here=<n>`.
 Don't commit: leave the files for the user's normal commit, and list them in your handover.
 
 **Updating a pack** (the code changed, the user has feedback, or `check` flagged it): read the current page and
-the changed sources, revise only what's now wrong, re-run the step-5 check, `verify`, then republish to the
-**same** shared URL from `meta.json` so links people already have keep working.
+the changed sources, revise only what's now wrong, re-run the step-5 check, `verify`, then `publish-copy` and
+republish to the **same** shared URL from `meta.json` (pass it as `url` in a later session) so links people
+already have keep working.
 
 **Reviewing the library** ("which packs are out of date?"): `check`, then for each hit say what changed and
 whether the pack's claims still hold. Update the ones that are wrong; `verify` the ones that still hold.

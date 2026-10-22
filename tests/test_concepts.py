@@ -149,6 +149,48 @@ class PackTests(Project):
         self.assertIn("[open](https://claude.ai/x)", readme)
         self.assertIn('<h1>Concept library</h1>', self.read("docs/concepts/index.html"))
 
+    def test_few_sources_are_listed_inline(self):
+        header = self.read("docs/concepts/scoring/index.html")
+        self.assertIn("<!-- sources -->Built from <a href=", header)
+        self.assertNotIn("<details>", header)
+
+    def test_many_sources_fold_behind_a_count(self):
+        for name in ("a", "b", "c"):
+            self.put(f"src/{name}.py", "x = 1\n")
+        self.new("wide", "src/score.py", "src/a.py", "src/b.py", "src/c.py")
+        header = self.read("docs/concepts/wide/index.html")
+        self.assertIn("<summary>4 sources</summary>", header)
+        self.assertIn('<span class="source-list"><a href=', header)
+
+    def test_setting_sources_rewrites_the_header(self):
+        self.run_cli("set", "scoring", "sources=src/score.py")
+        header = self.read("docs/concepts/scoring/index.html")
+        self.assertIn(">src/score.py</a><!-- /sources -->", header)
+        self.assertNotIn(">src/net</a>", header)
+
+    def test_publish_copy_drops_the_document_wrapper_and_keeps_the_page(self):
+        out = os.path.join(self.repo, "copy.html")
+        code, printed = self.run_cli("publish-copy", "scoring", "--out", out)
+        self.assertEqual((code, printed.strip()), (0, out))
+        with open(out, encoding="utf-8") as f:
+            copy = f.read()
+        for tag in ("<!doctype", "<html", "</html>", "<head>", "</head>", "<body>", "</body>", "<meta charset"):
+            self.assertNotIn(tag, copy.lower())
+        self.assertTrue(copy.startswith("<title>Server scoring</title>"))
+        self.assertIn('id="present"', copy)
+        self.assertIn("/* theme:start */", copy)
+
+    def test_publish_copy_defaults_to_a_temp_file(self):
+        code, printed = self.run_cli("publish-copy", "scoring")
+        self.assertEqual(code, 0)
+        self.assertTrue(printed.strip().endswith(os.path.join("teach-a-concept", "scoring.html")))
+        self.assertTrue(os.path.isfile(printed.strip()))
+
+    def test_present_mode_keys_tolerate_targets_without_closest(self):
+        page = self.read("docs/concepts/scoring/index.html")
+        self.assertIn("target && target.closest && target.closest(selector)", page)
+        self.assertNotIn("e.target.closest(", page)
+
     def test_set_rejects_protected_keys(self):
         code, out = self.run_cli("set", "scoring", "fingerprint=x")
         self.assertEqual(code, 2)
