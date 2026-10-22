@@ -123,3 +123,7 @@ python -m unittest discover -s tests
 
 Bump `VERSION` in `concepts.py` and `version` in both `plugin.json` and `.claude-plugin/marketplace.json`
 together. Projects pick up the new tool copy the next time the skill runs there.
+
+## Licence
+
+[MIT](LICENSE)

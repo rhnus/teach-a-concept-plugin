@@ -2,6 +2,15 @@
   "name": "teach-a-concept",
   "version": "1.0.0",
   "description": "Turn a design, proposal, piece of code or work process into a short, visual, presentable teaching pack, kept in a concept library in the repo with an onboarding order and an out-of-date check.",
-  "author": { "name": "rhnus" },
-  "keywords": ["documentation", "onboarding", "architecture", "teaching", "presentation"]
+  "author": {
+    "name": "rhnus"
+  },
+  "keywords": [
+    "documentation",
+    "onboarding",
+    "architecture",
+    "teaching",
+    "presentation"
+  ],
+  "license": "MIT"
 }
