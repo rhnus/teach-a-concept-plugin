@@ -29,11 +29,11 @@ It is sized to fit a meeting (15, 30 or 60 minutes).
 In the Claude Code CLI:
 
 ```
-/plugin marketplace add OWNER/REPO
+/plugin marketplace add rhnus/teach-a-concept-plugin
 /plugin install teach-a-concept@teach-a-concept
 ```
 
-In VS Code, type `/plugins` to open **Manage plugins**. Add `OWNER/REPO` on the **Marketplaces** tab, then
+In VS Code, type `/plugins` to open **Manage plugins**. Add `rhnus/teach-a-concept-plugin` on the **Marketplaces** tab, then
 install **teach-a-concept** from the **Plugins** tab. Updates arrive when the plugin's version number changes.
 Turn on auto-update for this marketplace in the same dialog, or run
 `claude plugin update teach-a-concept@teach-a-concept`.
@@ -56,7 +56,7 @@ Until they do, Claude Code reports that the plugin is enabled but not installed.
 ```json
 {
   "extraKnownMarketplaces": {
-    "teach-a-concept": { "source": { "source": "github", "repo": "OWNER/REPO" } }
+    "teach-a-concept": { "source": { "source": "github", "repo": "rhnus/teach-a-concept-plugin" } }
   },
   "enabledPlugins": { "teach-a-concept@teach-a-concept": true }
 }
