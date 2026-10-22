@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}}</title>
+<script>try { var th = localStorage.getItem("{{theme_key}}"); if (th === "light" || th === "dark") document.documentElement.dataset.theme = th; } catch (e) {}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap">
+<style>
+/* theme:start */
+/* theme:end */
+/* --accent is for text and borders; --brand-fill is the colour behind white text.
+   Diagram tokens: --new, --existing, --highlight, --risk. */
+:root {
+  --new: var(--accent); --existing: var(--todo);
+  --display: "Barlow Semi Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --body: "Source Sans 3", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--surface); color: var(--ink); font: 17px/1.6 var(--body); }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--highlight); outline-offset: 2px; border-radius: 4px; }
+.wrap { max-width: 920px; margin: 0 auto; padding-inline: 16px; }
+h1, h2, h3 { text-wrap: balance; }
+
+.mast { background: var(--brand-fill); color: var(--on-blue); }
+.mast .wrap { padding-block: 22px 24px; display: grid; gap: 10px; }
+.mast .top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.brand { font: 600 13px/1.3 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--on-blue-muted); }
+.mast .actions { margin-left: auto; display: flex; gap: 8px; }
+.mast button { display: inline-flex; align-items: center; gap: 6px; font: 600 14px var(--body); color: var(--on-blue);
+  background: rgba(255, 255, 255, .12); border: 1px solid rgba(255, 255, 255, .3); border-radius: 99px; padding: 6px 14px; cursor: pointer; }
+.mast button:hover { background: rgba(255, 255, 255, .22); }
+.mast button.primary { background: var(--highlight); border-color: var(--highlight); color: #1B1205; }
+.eyebrow { font: 600 12px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--highlight); margin: 0; }
+.mast .eyebrow { color: var(--highlight-on-fill); }
+.mast h1 { font: 700 clamp(30px, 5vw, 44px)/1.04 var(--display); margin: 0; }
+.mast .lede { color: var(--on-blue-muted); margin: 0; max-width: 70ch; font-size: 18px; }
+.facts { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 2px 0 0; padding: 0; list-style: none; font-size: 14px; color: var(--on-blue-muted); }
+.facts b { color: var(--on-blue); font-weight: 600; }
+.facts a { color: var(--on-blue); }
+
+.concept-status { font-size: 14px; font-weight: 600; padding: 8px 14px; border-radius: 8px; margin: 20px 0 0; }
+.concept-status--current { color: var(--done); background: var(--done-bg); }
+.concept-status--needs-review { color: var(--progress); background: var(--progress-bg); }
+.concept-status--superseded { color: var(--todo); background: var(--todo-bg); }
+
+main { padding-block: 8px 64px; }
+section.slide { background: var(--card); border: 1px solid var(--line); border-top: 3px solid var(--highlight);
+  border-radius: 4px 4px 12px 12px; padding: 22px 24px 24px; margin-top: 20px; }
+section.slide h2 { font: 700 26px/1.12 var(--display); color: var(--accent); margin: 0 0 12px; }
+section.slide h3 { font: 700 19px/1.2 var(--display); color: var(--accent); margin: 18px 0 6px; }
+section.slide p { margin: 0 0 12px; max-width: 72ch; }
+.objective { font-size: 21px; line-height: 1.45; border-left: 5px solid var(--highlight); padding: 4px 0 4px 16px; margin: 0; }
+.objective b { color: var(--accent); }
+
+figure { margin: 18px 0; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+figure svg { width: 100%; height: auto; display: block; font-family: var(--body); }
+figcaption { color: var(--muted); font-size: 15px; margin-top: 10px; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 13px; color: var(--muted); margin-top: 8px; }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; background: var(--swatch); }
+
+pre { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 8px;
+  padding: 12px 14px; overflow-x: auto; font: 14px/1.55 var(--mono); margin: 12px 0 6px; }
+code { font-family: var(--mono); font-size: .9em; }
+p code, li code { background: var(--link-bg); border-radius: 4px; padding: 0 4px; }
+.src { font: 500 13px var(--mono); color: var(--muted); }
+
+.tag { display: inline-block; font: 700 11px/1 var(--mono); letter-spacing: .04em; text-transform: uppercase;
+  padding: 4px 7px; border-radius: 4px; vertical-align: 2px; margin-right: 8px; }
+.tag-assumption { color: var(--progress); background: var(--progress-bg); }
+.tag-decision { color: var(--on-blue); background: var(--brand-fill); }
+.tag-application { color: var(--accent); background: var(--link-bg); }
+.tag-risk { color: var(--risk); background: var(--risk-bg); }
+ol.questions { padding-left: 1.3em; margin: 0; display: grid; gap: 14px; }
+ol.questions li::marker { font: 700 18px var(--display); color: var(--accent); }
+
+.open-lists { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.open-lists > div { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.open-lists h3 { margin-top: 0 !important; font-size: 17px !important; }
+.open-lists ul { padding-left: 1.1em; margin: 0; display: grid; gap: 6px; font-size: 16px; }
+
+footer.foot { border-top: 1px solid var(--line); margin-top: 32px; padding-top: 14px; font-size: 13px; color: var(--muted); }
+.counter { display: none; }
+
+/* Present mode: one section fills the screen; arrow keys move between them. */
+body.presenting { overflow: hidden; }
+body.presenting .mast, body.presenting footer.foot, body.presenting .concept-status { display: none; }
+body.presenting main { padding: 0; }
+body.presenting section.slide { display: none; position: fixed; inset: 0; margin: 0; border: 0; border-top: 8px solid var(--highlight);
+  border-radius: 0; background: var(--surface); padding: 7vh max(7vw, 16px) 8vh; overflow-y: auto; font-size: 22px; }
+body.presenting section.slide.active { display: block; }
+body.presenting section.slide h2 { font-size: clamp(32px, 4.4vw, 52px); margin-bottom: 28px; }
+body.presenting section.slide p { max-width: 60ch; }
+body.presenting .objective { font-size: clamp(26px, 3vw, 36px); }
+body.presenting figure svg { max-height: 60vh; }
+body.presenting #title-slide { background: var(--brand-fill); color: var(--on-blue); display: none; }
+body.presenting #title-slide.active { display: grid; align-content: center; }
+body.presenting #title-slide h2 { color: var(--on-blue); font-size: clamp(44px, 6vw, 76px); }
+body.presenting #title-slide p { color: var(--on-blue-muted); }
+body.presenting #title-slide .eyebrow { color: var(--highlight-on-fill); }
+body.presenting .counter { display: block; position: fixed; right: 18px; bottom: 14px; z-index: 2; font: 500 13px var(--mono); color: var(--faint); }
+
+@media (max-width: 600px) {
+  section.slide { padding: 18px 16px; }
+  .mast .actions { margin-left: 0; }
+}
+@media print {
+  .mast .actions { display: none; }
+  .mast { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  section.slide { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<header class="mast">
+  <div class="wrap">
+    <div class="top">
+      <span class="brand">{{brand}}</span>
+      <span class="actions">
+        <button type="button" id="themeToggle"></button>
+        <button type="button" class="primary" id="present" title="Present (P). Arrow keys to move, Esc to exit">Present</button>
+      </span>
+    </div>
+    <p class="eyebrow">{{type_label}}</p>
+    <h1>{{title}}</h1>
+    <p class="lede">{{summary}}</p>
+    <ul class="facts">
+      <li>For <b>{{audience}}</b></li>
+      <li><b>{{minutes}}</b>-minute meeting</li>
+      <li><!-- read-time --><b>?</b> min read<!-- /read-time --></li>
+      <li>Owner <b>{{owner}}</b></li>
+      <li>Built from {{sources}}</li>
+      <li>{{date}}</li>
+    </ul>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- concept-status --><p class="concept-status concept-status--current">Current.</p><!-- /concept-status -->
+
+  <!-- Fill every [[...]]; `concepts.py verify` refuses a pack that still has one.
+       Each section.slide is one screen in Present mode: split a long section into two slides rather than letting it scroll. -->
+  <section class="slide" id="title-slide" hidden>
+    <p class="eyebrow">{{type_label}}</p>
+    <h2>{{title}}</h2>
+    <p>{{summary}}</p>
+  </section>
+
+  <section class="slide" id="objective">
+    <h2>Learning objective</h2>
+    <p class="objective">After this session, the team can <b>[[observable verb + outcome]]</b>.</p>
+  </section>
+
+  <section class="slide" id="explanation">
+    <h2>[[The problem it solves]]</h2>
+    <p>[[2-3 sentences in this project's terms.]]</p>
+  </section>
+
+  <section class="slide" id="core-idea">
+    <h2>[[The core idea]]</h2>
+    <figure>
+      <!-- Inline SVG. Colour with var(--new), var(--existing), var(--highlight), var(--risk), var(--ink), var(--line) so it follows the theme. -->
+      <svg viewBox="0 0 800 300" role="img" aria-labelledby="core-idea-title"><title id="core-idea-title">[[what the diagram shows]]</title></svg>
+      <figcaption>[[what to look at in the diagram]]</figcaption>
+      <div class="legend"><span style="--swatch: var(--new)">New</span><span style="--swatch: var(--existing)">Existing</span><span style="--swatch: var(--highlight)">Focus</span></div>
+    </figure>
+    <p>[[short paragraph]]</p>
+  </section>
+
+  <section class="slide" id="limits">
+    <h2>Where it bends or breaks</h2>
+    <p>[[trade-off, footgun, uncovered case]]</p>
+  </section>
+
+  <section class="slide" id="example">
+    <h2>In our project: [[walkthrough name]]</h2>
+    <figure>[[diagram of the real flow]]</figure>
+    <pre><code>[[at most 15 lines]]</code></pre>
+    <p class="src"><a href="[[concepts.py link output]]">[[path:line]]</a></p>
+  </section>
+
+  <section class="slide" id="questions">
+    <h2>Discussion questions</h2>
+    <ol class="questions">
+      <li><span class="tag tag-decision">Decision</span>[[question]]</li>
+      <li><span class="tag tag-application">Application</span>[[question]]</li>
+      <li><span class="tag tag-risk">Risk</span>[[question]]</li>
+    </ol>
+  </section>
+
+  <section class="slide" id="open-points">
+    <h2>Assumptions, open points and items to clarify</h2>
+    <div class="open-lists">
+      <div><h3>Assumed</h3><ul><li>[[assumption, and why]]</li></ul></div>
+      <div><h3>Open</h3><ul><li>[[for the meeting to settle]]</li></ul></div>
+      <div><h3>To clarify</h3><ul><li>[[what, from whom]]</li></ul></div>
+    </div>
+  </section>
+
+  <footer class="foot">Master copy: <code>{{pack_path}}</code> in the repo. Press <b>P</b> to present.</footer>
+</main>
+<div class="counter" id="counter" aria-live="polite"></div>
+<script>
+(function () {
+  const root = document.documentElement;
+  const toggle = document.getElementById('themeToggle');
+  function isDark() { return root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; }
+  function label() { toggle.textContent = isDark() ? 'Light mode' : 'Dark mode'; }
+  toggle.addEventListener('click', () => {
+    root.dataset.theme = isDark() ? 'light' : 'dark';
+    try { localStorage.setItem('{{theme_key}}', root.dataset.theme); } catch (e) {}
+    label();
+  });
+  label();
+
+  const slides = Array.from(document.querySelectorAll('section.slide'));
+  const counter = document.getElementById('counter');
+  const titleSlide = document.getElementById('title-slide');
+  let index = 0;
+  function show(i) {
+    index = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach((s, n) => s.classList.toggle('active', n === index));
+    slides[index].scrollTop = 0;
+    counter.textContent = (index + 1) + ' / ' + slides.length;
+  }
+  function start() { titleSlide.hidden = false; document.body.classList.add('presenting'); show(0); }
+  function stop() {
+    document.body.classList.remove('presenting');
+    slides.forEach(s => s.classList.remove('active'));
+    titleSlide.hidden = true;
+  }
+  document.getElementById('present').addEventListener('click', start);
+  document.addEventListener('keydown', e => {
+    if (e.target.closest('input, textarea, select, [contenteditable]')) return;
+    const presenting = document.body.classList.contains('presenting');
+    if (!presenting) { if (e.key === 'p' || e.key === 'P') start(); return; }
+    if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); show(index + 1); }
+    else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); show(index - 1); }
+    else if (e.key === 'Home') show(0);
+    else if (e.key === 'End') show(slides.length - 1);
+    else if (e.key === 'Escape') stop();
+  });
+  document.addEventListener('click', e => {
+    if (!document.body.classList.contains('presenting') || e.target.closest('a, button, pre')) return;
+    show(index + (e.clientX < window.innerWidth / 3 ? -1 : 1));
+  });
+})();
+</script>
+</body>
+</html>

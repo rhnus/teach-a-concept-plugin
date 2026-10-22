@@ -1,0 +1,37 @@
+/* NUS theme: NUS blue #003D7C with NUS orange #EF7C00. In dark mode navy surfaces share the blue hue and
+   orange is the only warm accent. */
+:root {
+  color-scheme: light;
+  --accent: #003D7C; --highlight: #EF7C00; --brand-fill: #003D7C; --highlight-on-fill: #F7B267;
+  --ink: #18222F; --muted: #536072; --faint: #7C899B;
+  --line: #DCE2EA; --line-strong: #B9C6D6; --tint: #F3F6FA; --card: #F8F8F8; --surface: #FFFFFF;
+  --on-blue: #FFFFFF; --on-blue-muted: #BFD0E6;
+  --done: #1F7A4D; --done-bg: #E3F2E9;
+  --progress: #965A00; --progress-bg: #FCEFD9;
+  --todo: #556274; --todo-bg: #ECEFF3;
+  --risk: #B42318; --risk-bg: #FCEBE9;
+  --link-bg: #E3ECF7;
+  --shadow: 0 1px 2px rgba(0, 43, 89, .06), 0 8px 24px rgba(0, 43, 89, .08);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --accent: #8FB9EC; --highlight: #F2A35E; --brand-fill: #133A66; --highlight-on-fill: #F7B267;
+    --ink: #E6ECF4; --muted: #A3B1C4; --faint: #73839A;
+    --line: #263449; --line-strong: #34455E; --tint: #172334; --card: #131D2B; --surface: #0E1622;
+    --on-blue: #FFFFFF; --on-blue-muted: #B3C7E3;
+    --done: #6CCBAA; --done-bg: #12302D; --progress: #E8B465; --progress-bg: #2E2719;
+    --todo: #9DAABD; --todo-bg: #1C2738; --risk: #F08C7E; --risk-bg: #35191D; --link-bg: #183150;
+    --shadow: 0 1px 2px rgba(2, 8, 18, .45), 0 8px 24px rgba(2, 8, 18, .4);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --accent: #8FB9EC; --highlight: #F2A35E; --brand-fill: #133A66; --highlight-on-fill: #F7B267;
+  --ink: #E6ECF4; --muted: #A3B1C4; --faint: #73839A;
+  --line: #263449; --line-strong: #34455E; --tint: #172334; --card: #131D2B; --surface: #0E1622;
+  --on-blue: #FFFFFF; --on-blue-muted: #B3C7E3;
+  --done: #6CCBAA; --done-bg: #12302D; --progress: #E8B465; --progress-bg: #2E2719;
+  --todo: #9DAABD; --todo-bg: #1C2738; --risk: #F08C7E; --risk-bg: #35191D; --link-bg: #183150;
+  --shadow: 0 1px 2px rgba(2, 8, 18, .45), 0 8px 24px rgba(2, 8, 18, .4);
+}
